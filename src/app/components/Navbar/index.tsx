@@ -46,7 +46,7 @@ export default function AppNavbar() {
           ) : (
             <div className='d-flex gap-2 align-items-center'>
               <div>Welcome someone@gmail.com</div>
-              <Link className='btn btn-outline-success' href={'/share-movie'}>
+              <Link className='btn btn-outline-success' href={'/share'}>
                 Share a movie
               </Link>
               <Button variant="outline-secondary" onClick={handleLogout}>Logout</Button>

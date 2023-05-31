@@ -1,7 +1,7 @@
 "use client"
 import Movie from "./components/Movie";
 
-export default function Home() {
+export default function HomePage() {
 
   return (
     <div>
