@@ -1,5 +1,11 @@
+"use client"
+import Movie from "./components/Movie";
+
 export default function Home() {
+
   return (
-    <div>Hello</div>
+    <div>
+      {[1, 2, 3, 4, 5].map(() => <Movie />)}
+    </div>
   )
 }
