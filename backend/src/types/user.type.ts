@@ -1,4 +1,5 @@
 import { User } from "@prisma/client";
+import { Request } from "express";
 
 export class UserLoginBody {
   email: string = "";
@@ -11,3 +12,10 @@ export class LoginOrRegisterResponseBody {
   data: Partial<User> | null = null;
   jwtToken: string | null = null;
 }
+
+export class JwtUserPayload {
+  id: number = 1;
+  email: string = "";
+}
+
+export type RequestWithJwtUserPayload = Request & { user: JwtUserPayload };

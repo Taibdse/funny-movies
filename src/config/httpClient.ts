@@ -11,4 +11,10 @@ const axiosClient = axios.create({
   },
 });
 
+export const setAuthRequestHeader = (token: string | null) => {
+  if (token)
+    axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  axiosClient.defaults.headers.common["Authorization"] = undefined;
+};
+
 export default axiosClient;

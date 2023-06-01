@@ -17,3 +17,20 @@ export type YoutubeVideoInfo = {
 export type FetchYoutubeVideoInfoData = {
   data: YoutubeVideoInfo;
 };
+
+export type LoginOrRegisterForm = {
+  email: string;
+  password: string;
+};
+
+export type User = {
+  id: number;
+  email: string;
+};
+
+export class LoginOrRegisterResponseBody {
+  isAuth: boolean = false;
+  message: string = "";
+  data: User | null = null;
+  jwtToken: string | null = null;
+}

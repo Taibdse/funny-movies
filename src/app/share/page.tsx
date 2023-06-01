@@ -6,6 +6,7 @@ import InputField from '../components/InputField'
 import { ShareMovie, defaultShareMovieValues, shareMovieValidationSchema } from './constants';
 import { Button, Card } from 'react-bootstrap';
 import { ApiService } from '@/services/api';
+import { AxiosResponse } from 'axios';
 
 export default function ShareMoviePage() {
 
@@ -21,7 +22,7 @@ export default function ShareMoviePage() {
   const onSubmit = async (values: ShareMovie) => {
     console.log({ values });
     try {
-      const response = await ApiService.getYoutubeVideoInfo(values.ytLink);
+      const response: AxiosResponse<> = await ApiService.getYoutubeVideoInfo(values.ytLink);
       console.log(response);
     } catch (error) {
 
