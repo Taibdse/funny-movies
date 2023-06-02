@@ -1,4 +1,4 @@
-import { JwtUserPayload } from "./user.type";
+import { JwtUserPayload } from "../user.type";
 
 // to make the file a module and avoid the TypeScript error
 // export {};

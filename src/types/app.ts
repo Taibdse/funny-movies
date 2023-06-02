@@ -28,9 +28,30 @@ export type User = {
   email: string;
 };
 
+export type Movie = {
+  id: number;
+  title: string;
+  description: string;
+  videoLink: string;
+  youtubeLink: string;
+  user?: User;
+  userId: number;
+};
+
 export class LoginOrRegisterResponseBody {
   isAuth: boolean = false;
   message: string = "";
   data: User | null = null;
   jwtToken: string | null = null;
 }
+
+export class ShareMovieResponseBody {
+  message: string = "";
+  data: User | null = null;
+  isDuplicatedLink: boolean = false;
+  success: boolean = true;
+}
+
+export type ShareMovieForm = {
+  ytLink: string;
+};

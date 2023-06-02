@@ -14,7 +14,21 @@ const axiosClient = axios.create({
 export const setAuthRequestHeader = (token: string | null) => {
   if (token)
     axiosClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  axiosClient.defaults.headers.common["Authorization"] = undefined;
+  else axiosClient.defaults.headers.common["Authorization"] = undefined;
+};
+
+export const setUnauthorizedResponseIntercepter = (callback: Function) => {
+  axiosClient.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      if ([401, 403].includes(error.response.status)) {
+        callback();
+      }
+      return error;
+    }
+  );
 };
 
 export default axiosClient;

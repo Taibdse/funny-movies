@@ -36,7 +36,7 @@ export class UserService {
 
   static async genJwtToken(userPayload: JwtUserPayload) {
     const token = jwt.sign(userPayload, process.env.JWT_SECRET_KEY || "", {
-      expiresIn: "2h",
+      expiresIn: "2d",
     });
     return token;
   }
@@ -44,7 +44,6 @@ export class UserService {
   static async loginOrRegister(req: Request, res: Response) {
     const result = new LoginOrRegisterResponseBody();
     const userLoginRegisterBody: UserLoginBody = req.body;
-    console.log({ userLoginRegisterBody });
     try {
       const user = await prisma.user.findFirst({
         where: { email: userLoginRegisterBody.email },

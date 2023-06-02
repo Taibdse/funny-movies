@@ -3,14 +3,17 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import InputField from '../components/InputField'
-import { ShareMovie, defaultShareMovieValues, shareMovieValidationSchema } from './constants';
+import { defaultShareMovieValues, shareMovieValidationSchema } from './constants';
 import { Button, Card } from 'react-bootstrap';
 import { ApiService } from '@/services/api';
 import { AxiosResponse } from 'axios';
+import { ShareMovieForm, ShareMovieResponseBody } from '@/types/app';
+import { useRouter } from 'next/navigation';
 
 export default function ShareMoviePage() {
+  const router = useRouter();
 
-  const shareForm = useForm<ShareMovie>({
+  const shareForm = useForm<ShareMovieForm>({
     resolver: yupResolver(shareMovieValidationSchema),
     defaultValues: defaultShareMovieValues,
     mode: 'onChange',
@@ -19,13 +22,24 @@ export default function ShareMoviePage() {
   const { control, handleSubmit } = shareForm;
 
 
-  const onSubmit = async (values: ShareMovie) => {
-    console.log({ values });
+  const onSubmit = async (values: ShareMovieForm) => {
     try {
-      const response: AxiosResponse<> = await ApiService.getYoutubeVideoInfo(values.ytLink);
+      const response: AxiosResponse<ShareMovieResponseBody> = await ApiService.shareMovie(values);
       console.log(response);
+      const { data, isDuplicatedLink, success, message } = response.data;
+      if (success) {
+        alert('Shared successfully!');
+        shareForm.reset(defaultShareMovieValues);
+        // router.push('/');
+      } else {
+        if (isDuplicatedLink) {
+          alert('Duplicated youtube link!');
+        } else {
+          alert(message || 'Cannot process to save this link!');
+        }
+      }
     } catch (error) {
-
+      alert('There is something wrong to process the request!');
     }
   }
 

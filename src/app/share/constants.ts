@@ -1,8 +1,5 @@
+import { ShareMovieForm } from "@/types/app";
 import * as yup from "yup";
-
-export type ShareMovie = {
-  ytLink: string;
-};
 
 export const shareMovieValidationSchema = yup
   .object()
@@ -20,6 +17,6 @@ export const shareMovieValidationSchema = yup
   })
   .required();
 
-export const defaultShareMovieValues: ShareMovie = {
+export const defaultShareMovieValues: ShareMovieForm = {
   ytLink: "",
 };

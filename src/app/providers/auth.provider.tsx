@@ -1,8 +1,9 @@
 "use client";
-import axiosClient, { setAuthRequestHeader } from "@/config/httpClient";
+import axiosClient, { setAuthRequestHeader, setUnauthorizedResponseIntercepter } from "@/config/httpClient";
 import { ApiService } from "@/services/api";
 import { LoginOrRegisterForm, LoginOrRegisterResponseBody, User } from "@/types/app";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
 export type IAuthContext = {
@@ -31,6 +32,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuth, setAuth] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const saveJwtToken = (token: string) => {
     localStorage.setItem(jwtTokenKey, token)
@@ -70,6 +72,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAuth(false);
     setUser(null);
     setAuthRequestHeader(null);
+    router.push('/');
   }
 
   const decodeJwt = (token: string | null): User | null => {
@@ -85,12 +88,17 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const initAuth = () => {
     const jwtToken = getJwtToken();
     const user: User | null = decodeJwt(jwtToken);
+    setUnauthorizedResponseIntercepter(() => {
+      logout();
+    })
+
     if (!user) {
       setAuth(false);
       setUser(null)
     } else {
       setAuth(true);
       setUser(user);
+      setAuthRequestHeader(jwtToken);
     }
     setLoading(false);
   }
