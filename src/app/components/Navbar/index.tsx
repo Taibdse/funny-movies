@@ -13,16 +13,16 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import InputField from '../InputField';
 import { LoginOrRegisterForm, LoginOrRegisterResponseBody } from '@/types/app';
-import { useAuth } from '@/app/providers/auth.provider';
+import { useApp } from '@/app/providers/app.provider';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 export default function AppNavbar() {
   const router = useRouter();
-  const { isAuth, user, login, logout } = useAuth();
+  const { isAuth, user, login, logout } = useApp();
 
   const handleLogout = () => {
     logout();
-    router.push('/');
   }
 
   const loginOrRegisterForm = useForm<LoginOrRegisterForm>({
@@ -36,32 +36,15 @@ export default function AppNavbar() {
   const onSubmit = async (values: LoginOrRegisterForm) => {
     const result: LoginOrRegisterResponseBody | null = await login(values);
     if (!result) {
-      alert('There is something wrong with server! Please try again');
+      toast.error('There is something wrong with server! Please try again');
     } else {
       if (result.isAuth) {
-        if (result.data) alert('Registered Successfully!');
-        else alert('Login Successfully!');
+        if (result.data) toast.success('Registered Successfully!');
+        else toast.success('Login Successfully!');
       } else {
-        alert(result.message);
+        toast.error(result.message);
       }
     }
-
-    // console.log({ values });
-    // try {
-    //   const response: AxiosResponse<LoginOrRegisterResponseBody> = await ApiService.loginOrRegister(values);
-    //   const { isAuth, message, data, jwtToken } = response.data;
-    //   if (isAuth) {
-    //     if (data) alert('Registered Successfully!');
-    //     else alert('Login Successfully!');
-    //     localStorage.setItem('jwtToken', jwtToken || "");
-    //     setAuth(true);
-    //   } else {
-    //     alert(message);
-    //   }
-    //   console.log({ response });
-    // } catch (error) {
-    //   console.log({ error })
-    // }
   }
 
   return (

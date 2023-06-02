@@ -24,3 +24,19 @@ export const verifyToken = (
   }
   return next();
 };
+
+export const validateToken = (token: string | null): any => {
+  if (!token || !token.includes("Bearer")) {
+    return null;
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token.split(" ")[1],
+      process.env.JWT_SECRET_KEY || ""
+    );
+    return decoded;
+  } catch (err) {
+    return null;
+  }
+};

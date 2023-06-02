@@ -8,11 +8,9 @@ import { Button, Card } from 'react-bootstrap';
 import { ApiService } from '@/services/api';
 import { AxiosResponse } from 'axios';
 import { ShareMovieForm, ShareMovieResponseBody } from '@/types/app';
-import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 export default function ShareMoviePage() {
-  const router = useRouter();
-
   const shareForm = useForm<ShareMovieForm>({
     resolver: yupResolver(shareMovieValidationSchema),
     defaultValues: defaultShareMovieValues,
@@ -21,25 +19,22 @@ export default function ShareMoviePage() {
 
   const { control, handleSubmit } = shareForm;
 
-
   const onSubmit = async (values: ShareMovieForm) => {
     try {
       const response: AxiosResponse<ShareMovieResponseBody> = await ApiService.shareMovie(values);
-      console.log(response);
       const { data, isDuplicatedLink, success, message } = response.data;
       if (success) {
-        alert('Shared successfully!');
+        toast.success('Shared successfully!');
         shareForm.reset(defaultShareMovieValues);
-        // router.push('/');
       } else {
         if (isDuplicatedLink) {
-          alert('Duplicated youtube link!');
+          toast.error('Duplicated youtube link!');
         } else {
-          alert(message || 'Cannot process to save this link!');
+          toast.error(message || 'Cannot process to save this link!');
         }
       }
     } catch (error) {
-      alert('There is something wrong to process the request!');
+      toast.error('There is something wrong to process the request!');
     }
   }
 

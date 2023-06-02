@@ -14,7 +14,9 @@ import {
   ShareMovieResponseBody,
   YoutubeVideoInfo,
 } from "../types/movie.type";
+import url from "url";
 import axios, { AxiosResponse } from "axios";
+import { userAndSocketMap } from "..";
 dotenv.config();
 
 export class MovieService {
@@ -46,7 +48,7 @@ export class MovieService {
         result.success = false;
         result.message = "The youtube video link is incorrect!";
       } else {
-        const videoId: string | null = new URLSearchParams(data.ytLink).get(
+        const videoId: string | null = new URL(data.ytLink).searchParams.get(
           "v"
         );
 
@@ -60,8 +62,29 @@ export class MovieService {
           },
         });
         result.data = createdMovie;
+        console.log({ userAndSocketMap, id: req.user?.id });
+
+        Object.keys(userAndSocketMap).forEach((userId: any) => {
+          if (req.user?.id != userId) {
+            userAndSocketMap[userId].emit("new-movie", {
+              ...createdMovie,
+              sharer: {
+                id: req.user?.id,
+                email: req.user?.email,
+              },
+            });
+          }
+        });
       }
     }
     return res.status(200).json(result);
+  }
+
+  static async getAll(req: Request, res: Response) {
+    const movies = await prisma.movie.findMany({
+      orderBy: { id: "desc" },
+      include: { sharer: { select: { id: true, email: true } } },
+    });
+    res.status(200).json(movies);
   }
 }

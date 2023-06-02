@@ -1,11 +1,10 @@
-import { ShareMovieForm } from "@/app/share/constants";
 import axiosClient from "@/config/httpClient";
 import {
-  FetchYoutubeVideoInfoData,
   LoginOrRegisterForm,
   LoginOrRegisterResponseBody,
+  Movie,
+  ShareMovieForm,
   ShareMovieResponseBody,
-  YoutubeVideoInfo,
 } from "@/types/app";
 import { AxiosResponse } from "axios";
 
@@ -22,5 +21,10 @@ export class ApiService {
   ): Promise<AxiosResponse<ShareMovieResponseBody>> {
     const url = "/movie/share";
     return axiosClient.post<ShareMovieResponseBody>(url, data);
+  }
+
+  static async getMovies(): Promise<AxiosResponse<Movie[]>> {
+    const url = "/movie";
+    return axiosClient.get<Movie[]>(url);
   }
 }

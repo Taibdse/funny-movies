@@ -35,7 +35,8 @@ export type Movie = {
   videoLink: string;
   youtubeLink: string;
   user?: User;
-  userId: number;
+  sharer?: User;
+  userId?: number;
 };
 
 export class LoginOrRegisterResponseBody {

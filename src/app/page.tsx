@@ -1,11 +1,21 @@
 "use client"
-import Movie from "./components/Movie";
+import { useEffect, useState } from "react";
+import MovieComponent from "./components/Movie";
+import { ApiService } from "@/services/api";
+import { AxiosResponse } from 'axios';
+import { Movie } from "@/types/app";
+import { useApp } from "./providers/app.provider";
 
 export default function HomePage() {
+  const { movies, getMovies } = useApp();
+
+  useEffect(() => {
+    getMovies();
+  }, [])
 
   return (
-    <div>
-      {[1, 2, 3, 4, 5].map(() => <Movie />)}
+    <div className="mt-4">
+      {movies.map((movie: Movie) => <MovieComponent key={movie.id} movie={movie} />)}
     </div>
   )
 }

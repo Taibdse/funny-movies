@@ -1,37 +1,46 @@
 "use client";
-import axiosClient, { setAuthRequestHeader, setUnauthorizedResponseIntercepter } from "@/config/httpClient";
+import { setAuthRequestHeader, setUnauthorizedResponseIntercepter } from "@/config/httpClient";
 import { ApiService } from "@/services/api";
-import { LoginOrRegisterForm, LoginOrRegisterResponseBody, User } from "@/types/app";
+import { LoginOrRegisterForm, LoginOrRegisterResponseBody, Movie, User } from "@/types/app";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
+import { io as socketIO } from 'socket.io-client';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export type IAuthContext = {
+export type IAppContext = {
   isAuth: boolean;
   user: User | null;
   loading: boolean;
+  movies: Movie[];
+  getMovies: () => void,
   setAuth: (isAuth: boolean) => void,
   logout: () => void,
   login: (values: LoginOrRegisterForm) => Promise<LoginOrRegisterResponseBody | null>
 };
 
-const AuthContext = createContext<IAuthContext>({
+const AppContext = createContext<IAppContext>({
   isAuth: false,
   user: null,
   loading: true,
+  movies: [],
+  getMovies: () => { },
   setAuth: (isAuth: boolean) => { },
   logout: () => { },
   login: (values: LoginOrRegisterForm) => Promise.resolve(null)
 });
 
-const useAuth = () => useContext(AuthContext);
+const useApp = () => useContext(AppContext);
 
 const jwtTokenKey = 'jwtToken';
 
-const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuth, setAuth] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState<any>(null);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const router = useRouter();
 
   const saveJwtToken = (token: string) => {
@@ -44,6 +53,24 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const getJwtToken = () => {
     return localStorage.getItem(jwtTokenKey)
+  }
+
+  const setupSocketIo = () => {
+    const socket = socketIO(process.env.NEXT_PUBLIC_SOCKET_IO_URL || "");
+    setSocket(socket);
+    socket.on("connect", () => {
+      console.log(`${socket.id} connected`);
+      socket.emit("send-jwt-token", `Bearer ${getJwtToken()}`);
+    })
+    socket.on("new-movie", (movie: Movie) => {
+      toast.info(`${movie.sharer?.email} just shared the video ${movie.title}`);
+      getMovies();
+    })
+    socket.on("disconnect", () => {
+      setSocket(null);
+    })
+
+    return socket;
   }
 
   const login = async (values: LoginOrRegisterForm): Promise<LoginOrRegisterResponseBody | null> => {
@@ -103,13 +130,41 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }
 
+  const clearSocket = () => {
+    socket?.disconnect();
+    setSocket(null);
+  }
+
+  const getMovies = async () => {
+    try {
+      const response: AxiosResponse<Movie[]> = await ApiService.getMovies();
+      setMovies(response.data);
+    } catch (error) {
+      setMovies([])
+    }
+  }
+
   useEffect(() => {
     initAuth();
-  }, [])
+  }, []);
 
-  const value: IAuthContext = { isAuth, user, loading, setAuth, login, logout };
+  useEffect(() => {
+    if (isAuth) {
+      setupSocketIo();
+    }
+    () => {
+      clearSocket();
+    }
+  }, [isAuth]);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const value: IAppContext = { isAuth, user, loading, movies, setAuth, login, logout, getMovies };
+
+  return (
+    <AppContext.Provider value={value}>
+      <ToastContainer />
+      {!loading && children}
+    </AppContext.Provider>
+  );
 };
 
-export { useAuth, AuthProvider };
+export { useApp, AppProvider };

@@ -2,7 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css'
 import { Inter } from 'next/font/google'
 import Navbar from './components/Navbar';
-import { AuthProvider } from './providers/auth.provider.tsx';
+import { AppProvider } from './providers/app.provider';
+
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,10 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
+        <AppProvider>
           <Navbar />
           <div className='container'>{children}</div>
-        </AuthProvider>
+        </AppProvider>
       </body>
     </html>
   )
