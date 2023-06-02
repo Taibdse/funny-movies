@@ -3,7 +3,7 @@ import { setAuthRequestHeader, setUnauthorizedResponseIntercepter } from "@/conf
 import { ApiService } from "@/services/api";
 import { LoginOrRegisterForm, LoginOrRegisterResponseBody, Movie, User } from "@/types/app";
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import { io as socketIO } from 'socket.io-client';
 import { ToastContainer, toast } from 'react-toastify';
@@ -42,6 +42,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<any>(null);
   const [movies, setMovies] = useState<Movie[]>([]);
   const router = useRouter();
+  const pathName = usePathname();
 
   const saveJwtToken = (token: string) => {
     localStorage.setItem(jwtTokenKey, token)
@@ -118,10 +119,10 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     setUnauthorizedResponseIntercepter(() => {
       logout();
     })
-
     if (!user) {
       setAuth(false);
       setUser(null)
+
     } else {
       setAuth(true);
       setUser(user);
@@ -156,6 +157,12 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       clearSocket();
     }
   }, [isAuth]);
+
+  useEffect(() => {
+    if (!isAuth && pathName.includes('/share')) {
+      router.push('/')
+    }
+  }, [isAuth, pathName]);
 
   const value: IAppContext = { isAuth, user, loading, movies, setAuth, login, logout, getMovies };
 

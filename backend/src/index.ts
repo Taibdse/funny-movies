@@ -28,9 +28,17 @@ httpSocketIo.on("connection", function (socket: any) {
     if (jwtPayload) {
       userAndSocketMap[jwtPayload.id] = socket;
     } else {
-      userAndSocketMap[jwtPayload.id] = undefined;
       socket.disconnect();
     }
+  });
+
+  socket.on("disconnect", () => {
+    // remove the disconnected socket out of the map
+    Object.keys((userId: number) => {
+      if (userAndSocketMap[userId].id === socket.id) {
+        userAndSocketMap[userId] = undefined;
+      }
+    });
   });
 });
 

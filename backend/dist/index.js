@@ -39,18 +39,65 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.userAndSocketMap = void 0;
 var express_1 = __importDefault(require("express"));
-var client_1 = require("@prisma/client");
-var prisma = new client_1.PrismaClient();
+var cors_1 = __importDefault(require("cors"));
+// import http from "http";
+var user_service_1 = require("./services/user.service");
+var movie_service_1 = require("./services/movie.service");
+var auth_middleware_1 = require("./middlewares/auth.middleware");
+var http_1 = require("http");
+var socket_io_1 = require("socket.io");
 var app = (0, express_1.default)();
-var port = 3001;
-app.get("/login-or-resgister", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var port = Number(process.env.APP_PORT) || 3001;
+exports.userAndSocketMap = {};
+var httpServer = (0, http_1.createServer)(app);
+var httpSocketIo = new socket_io_1.Server(httpServer, {
+    cors: {
+        origin: "*",
+    },
+});
+app.use(express_1.default.json());
+app.use((0, cors_1.default)());
+httpSocketIo.on("connection", function (socket) {
+    console.log("a user connected");
+    socket.on("send-jwt-token", function (data) {
+        var jwtPayload = (0, auth_middleware_1.validateToken)(data);
+        if (jwtPayload) {
+            exports.userAndSocketMap[jwtPayload.id] = socket;
+        }
+        else {
+            socket.disconnect();
+        }
+    });
+    socket.on("disconnect", function () {
+        // remove the disconnected socket out of the map
+        Object.keys(function (userId) {
+            if (exports.userAndSocketMap[userId].id === socket.id) {
+                exports.userAndSocketMap[userId] = undefined;
+            }
+        });
+    });
+});
+app.post("/api/auth/login-or-register", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
+        user_service_1.UserService.loginOrRegister(req, res);
         return [2 /*return*/];
     });
 }); });
-console.log(1234);
-var server = app.listen(port, function () {
+app.post("/api/movie/share", auth_middleware_1.verifyToken, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        movie_service_1.MovieService.createMovie(req, res);
+        return [2 /*return*/];
+    });
+}); });
+app.get("/api/movie", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        movie_service_1.MovieService.getAll(req, res);
+        return [2 /*return*/];
+    });
+}); });
+httpServer.listen(port, function () {
     return console.log("Server is listening on port ".concat(port));
 });
 //# sourceMappingURL=index.js.map
