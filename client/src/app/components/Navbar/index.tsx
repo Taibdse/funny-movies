@@ -20,6 +20,7 @@ import { toast } from 'react-toastify';
 export default function AppNavbar() {
   const router = useRouter();
   const { isAuth, user, login, logout } = useApp();
+  const [isSubmitting, setSubmitting] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -34,7 +35,11 @@ export default function AppNavbar() {
   const { control, handleSubmit } = loginOrRegisterForm;
 
   const onSubmit = async (values: LoginOrRegisterForm) => {
+    if (isSubmitting) return
+
+    setSubmitting(true);
     const result: LoginOrRegisterResponseBody | null = await login(values);
+    setSubmitting(false);
     if (!result) {
       toast.error('There is something wrong with server! Please try again');
     } else {
@@ -48,7 +53,7 @@ export default function AppNavbar() {
   }
 
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar bg="light" expand="lg" data-testid="app-navbar">
       <Container fluid>
         <Navbar.Brand as={Link} href="/"><FaHome />Funny Movies</Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
@@ -59,20 +64,27 @@ export default function AppNavbar() {
             navbarScroll
           ></Nav>
           {!isAuth ? (
-            <Form className="d-flex gap-2" onSubmit={handleSubmit(onSubmit)}>
+            <Form data-testid="login-register-form" className="d-flex gap-2" onSubmit={handleSubmit(onSubmit)}>
               <InputField control={control} name='email' className='me-2' type='email' />
               <InputField control={control} name='password' className='me-2' type='password' />
               <div>
-                <Button type='submit' variant="outline-success">Login/Register</Button>
+                <Button
+                  disabled={isSubmitting}
+                  data-testid="submit-button"
+                  type='submit'
+                  variant="outline-success"
+                >
+                  {isSubmitting ? 'Loading…' : 'Login/Register'}
+                </Button>
               </div>
             </Form>
           ) : (
             <div className='d-flex gap-2 align-items-center'>
-              <div>Welcome {user?.email}</div>
-              <Link className='btn btn-outline-success' href={'/share'}>
+              <div data-testid="welcome-user">Welcome {user?.email}</div>
+              <Link data-testid="share-movie-button" className='btn btn-outline-success' href={'/share'}>
                 Share a movie
               </Link>
-              <Button variant="outline-secondary" onClick={handleLogout}>Logout</Button>
+              <Button data-testid="logout-button" variant="outline-secondary" onClick={handleLogout}>Logout</Button>
             </div>
           )}
         </Navbar.Collapse>

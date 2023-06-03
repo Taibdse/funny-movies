@@ -1,14 +1,14 @@
 import axios from "axios";
-import queryString from "query-string";
+// import queryString from "query-string";
 
 const axiosClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_ROOT_API,
   headers: {
     "Content-type": "application/json",
   },
-  paramsSerializer: {
-    serialize: (params) => queryString.stringify(params),
-  },
+  // paramsSerializer: {
+  //   serialize: (params) => queryString.stringify(params),
+  // },
 });
 
 export const setAuthRequestHeader = (token: string | null) => {

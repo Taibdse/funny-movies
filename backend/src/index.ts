@@ -11,7 +11,7 @@ const app: Express = express();
 const port: number = Number(process.env.APP_PORT) || 3001;
 
 export const userAndSocketMap: { [k: number]: any } = {};
-const httpServer = createServer(app);
+export const httpServer = createServer(app);
 const httpSocketIo = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -22,7 +22,6 @@ app.use(express.json());
 app.use(cors());
 
 httpSocketIo.on("connection", function (socket: any) {
-  console.log("a user connected");
   socket.on("send-jwt-token", (data: any) => {
     const jwtPayload = validateToken(data);
     if (jwtPayload) {

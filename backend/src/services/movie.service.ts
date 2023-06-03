@@ -62,7 +62,6 @@ export class MovieService {
           },
         });
         result.data = createdMovie;
-        console.log({ userAndSocketMap, id: req.user?.id });
 
         Object.keys(userAndSocketMap).forEach((userId: any) => {
           if (req.user?.id != userId) {

@@ -10,7 +10,7 @@ export default function Movie(props: MovieProps) {
   const { movie } = props;
 
   return (
-    <div className="row movie mb-3">
+    <div className="row movie mb-3" data-testid={`movie-${movie.id}`}>
       <div className="col-sm-5 pr-sm-2">
         <iframe
           className={styles['movie__youtube-video']}
@@ -19,13 +19,13 @@ export default function Movie(props: MovieProps) {
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
+          data-testid={`iframe-${movie.id}`}
         ></iframe>
       </div>
       <div className="col-sm-7 pl-sm-2">
-        <div className={styles['movie__title']}>{movie.title}</div>
-        <div className="movie__share-desc">Shared by {movie.sharer?.email}</div>
-        <div className="movie__like-dislike"></div>
-        <div className={styles['movie__desc']}>{movie.description}</div>
+        <div data-testid={`title-${movie.id}`} className={styles['movie__title']}>{movie.title}</div>
+        <div data-testid={`share-by-${movie.id}`} className="movie__share-desc">Shared by {movie.sharer?.email}</div>
+        <div data-testid={`desc-${movie.id}`} className={styles['movie__desc']}>{movie.description}</div>
       </div>
     </div>
   )

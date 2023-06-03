@@ -44,6 +44,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathName = usePathname();
 
+
   const saveJwtToken = (token: string) => {
     localStorage.setItem(jwtTokenKey, token)
   }

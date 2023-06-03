@@ -6,6 +6,6 @@
     "strict": true,
     "lib": ["esnext"],
     "esModuleInterop": true,
-    "typeRoots": ["./src/types"]
+    "typeRoots": ["./src/types"],
   }
 }
