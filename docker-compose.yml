@@ -1,0 +1,48 @@
+services:
+  server:
+    container_name: funny-movie-server
+    build:
+      dockerfile: Dockerfile
+      context: backend
+      target: development # Only will build development stage from dockerfile
+    environment: 
+      DATABASE_URL: postgresql://postgres:123456@postgres:5432/funny-movies
+      JWT_SECRET_KEY: 123abc
+      APP_PORT: 3001
+      YOUTUBE_API_URL: https://www.youtube.com/oembed
+    command: npm run dev:docker
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    depends_on:
+      - postgres
+
+  client:
+    container_name: funny-movie-client
+    build:
+      dockerfile: Dockerfile
+      context: client
+      target: development # Only will build development stage from dockerfile
+    environment: 
+      NEXT_PUBLIC_ROOT_API: http://localhost:3001/api
+      NEXT_PUBLIC_SOCKET_IO_URL: http://localhost:3001
+    command: npm run dev
+    ports:
+      - 3000:3000
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+  
+    environment:
+      POSTGRES_DB: funny-movies
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - 5432:5432
+    volumes:
+      - docker-postgres:/var/lib/postgresql/data
+
+volumes:
+  docker-postgres:
+    driver: local
