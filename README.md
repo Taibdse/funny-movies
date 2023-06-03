@@ -14,6 +14,7 @@ https://funny-movies-1agb3fay9-buiductai232.vercel.app/
 * ReactJS 18
 * ExpressJS 4
 * Prisma client 4
+* Docker 20+
 
 # Installation & Configuration
 
@@ -69,11 +70,13 @@ npx prisma migrate dev --name init
 ```
 We can check the local database and see the new created database called funny-movies and the tables (Movie, User)
 
+**If we want to run a project using docker, we just need to update the environment inside /docker-compose.yml file and no need to setup anything else!**
 
 # Database Setup
 Follow the step above to setup database postgresql for local project
 
 # Running the Application
+### Running project manually
 **Run backend app**
 ```
 npm run dev
@@ -95,6 +98,13 @@ Open browser and hit http://localhost:3000 to preview the funny-movies applicati
 ```
 npm run test
 ```
+
+### Running project using docker
+At the root folder, run command
+```
+docker-compose up -d
+```
+Then open http://localhost:3000 to preview the application
 
 # Deployment
 **Deploy Frontend application**
