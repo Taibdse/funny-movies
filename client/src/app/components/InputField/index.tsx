@@ -24,16 +24,17 @@ export default function InputField(props: FormFieldProps) {
   } = useController({ name, control });
 
   return (
-    <Form.Group className={formGroupProps?.className}>
-      {label && <Form.Label {...labelProps}>{label}</Form.Label>}
+    <Form.Group className={formGroupProps?.className} data-testid={`form-group_${name}`}>
+      {label && <Form.Label {...labelProps} data-testid={`form-label_${name}`}>{label}</Form.Label>}
       <Form.Control
         id={`control_${name}`}
+        data-testid={`control_${name}`}
         {...rest}
         {...field}
         value={field.value || ''}
       />
       {invalid && (
-        <Form.Text className="text-danger">
+        <Form.Text className="text-danger" data-testid={`error_${name}`}>
           {error?.message}
         </Form.Text>
       )}

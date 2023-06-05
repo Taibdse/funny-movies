@@ -49,13 +49,14 @@ export default function ShareMoviePage() {
     <div className=''>
       <div className='row mt-5'>
         <div className='col-sm-6 mx-auto'>
-          <Card style={{ width: '100%' }}>
+          <Card data-testid="share-movie-card" style={{ width: '100%' }}>
             <Card.Body>
-              <Card.Title>Share a Youtube movie</Card.Title>
+              <Card.Title data-testid="share-movie-card-title">Share a Youtube movie</Card.Title>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <InputField control={control} name='ytLink' label='Youtube URL' />
                 <div className='d-grid'>
                   <Button
+                    data-testid="share-movie-submit-btn"
                     disabled={isSubmitting}
                     type='submit'
                     className='mt-3 d-block'
