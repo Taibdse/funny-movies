@@ -20,7 +20,7 @@ export type IAppContext = {
   login: (values: LoginOrRegisterForm) => Promise<LoginOrRegisterResponseBody | null>
 };
 
-const AppContext = createContext<IAppContext>({
+export const AppContext = createContext<IAppContext>({
   isAuth: false,
   user: null,
   loading: true,
@@ -169,7 +169,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AppContext.Provider value={value}>
-      <ToastContainer />
+      <ToastContainer data-testid="app-toast" containerId={'app-toast'} />
       {!loading && children}
     </AppContext.Provider>
   );

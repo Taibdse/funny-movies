@@ -14,11 +14,9 @@ import { useForm } from 'react-hook-form';
 import InputField from '../InputField';
 import { LoginOrRegisterForm, LoginOrRegisterResponseBody } from '@/types/app';
 import { useApp } from '@/app/providers/app.provider';
-import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 
 export default function AppNavbar() {
-  const router = useRouter();
   const { isAuth, user, login, logout } = useApp();
   const [isSubmitting, setSubmitting] = useState(false);
 

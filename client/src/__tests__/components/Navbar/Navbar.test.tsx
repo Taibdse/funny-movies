@@ -1,31 +1,25 @@
 import AppNavbar from '@/app/components/Navbar';
+import { useApp, IAppContext } from '@/app/providers/app.provider';
+import { User } from '@/types/app';
 import '@testing-library/jest-dom';
-import { act, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from "@testing-library/user-event";
+jest.mock('../../../app/providers/app.provider');
 
-// import { createRouter } from 'next/router';
-// import { RouterContext } from 'next-server/dist/lib/router-context';
+const authUser: User = { id: 1, email: 'test@gmail.com' };
 
+const mockUseApp = useApp as jest.Mock<IAppContext>;
+const defaultUseAppReturnedValues: IAppContext = {
+  isAuth: false,
+  user: null,
+  login: jest.fn(),
+  logout: jest.fn(),
+  getMovies: jest.fn(),
+  loading: true,
+  setAuth: jest.fn(),
+  movies: []
+}
 
-
-// import * as nextRouter from 'next/router';
-
-// nextRouter.useRouter = jest.fn();
-// nextRouter.useRouter.mockImplementation(() => ({ route: '/' }));
-
-
-
-// import userEvent from '@testing-library/user-event';
-
-// const router = createRouter('', { user: 'nikita' }, '', {
-//   initialProps: {},
-//   pageLoader: jest.fn(),
-//   App: jest.fn(),
-//   Component: jest.fn(),
-// });
-
-// const useRouter = jest.spyOn(require('next/navigation'), 'useRouter')
-
-const authUser = { id: 1, email: 'test@gmail.com' };
 jest.mock("next/navigation", () => ({
   useRouter() {
     return {
@@ -43,84 +37,125 @@ jest.mock("next/navigation", () => ({
 
 }));
 
-
-
 describe('Navbar component', () => {
-  jest.mock('../../../app/providers/app.provider', () => ({
-    useApp: () => ({
-      isAuth: false,
-      user: null,
-      login: () => { },
-      logout: () => { }
-    })
-  }))
-
-  it('should render navbar correctly', () => {
+  it('should render navbar correctly when user do not login', () => {
+    mockUseApp.mockImplementation(() => ({
+      ...defaultUseAppReturnedValues,
+    }))
     render(
       <AppNavbar />
     );
 
-    const navbar = screen.getByTestId('app-navbar');
-    const loginRegisterForm = screen.getByTestId('login-register-form');
-    const submitButton = screen.getByTestId('submit-button');
+    const navbar = screen.queryByTestId('app-navbar');
+    const loginRegisterForm = screen.queryByTestId('login-register-form');
+    const submitButton = screen.queryByTestId('submit-button');
+    const emailControl = screen.queryByTestId('control_email');
+    const passwordControl = screen.queryByTestId('control_password');
+    const emailError = screen.queryByTestId('error_email');
+    const passwordError = screen.queryByTestId('error_password');
     expect(navbar).toBeInTheDocument();
     expect(loginRegisterForm).toBeInTheDocument();
     expect(submitButton).toBeInTheDocument();
+    expect(emailControl).toBeInTheDocument();
+    expect(passwordControl).toBeInTheDocument();
+    expect(emailError).not.toBeInTheDocument();
+    expect(passwordError).not.toBeInTheDocument();
+
   });
 
+  it('should validate error when the login form fields are invalid', async () => {
+    const mockLogin = jest.fn();
+    const user = userEvent.setup();
+    mockUseApp.mockImplementation(() => ({
+      ...defaultUseAppReturnedValues,
+      login: mockLogin
+    }));
 
+    render(
+      <AppNavbar />
+    );
 
-  // it('should render navbar correctly when user loged in', () => {
-  //   jest.mock('../../../app/providers/app.provider', () => ({
-  //     useApp: () => ({
-  //       isAuth: true,
-  //       user: authUser,
-  //       login: () => { },
-  //       logout: () => { }
-  //     })
-  //   }))
+    const emailControl = screen.getByTestId('control_email');
+    const passwordControl = screen.getByTestId('control_password');
+    const submitButton = screen.getByTestId('submit-button');
 
-  //   render(
-  //     <AppNavbar />
-  //   );
+    // set invalid value for both email and password
+    await user.type(emailControl, "123")
+    await user.type(passwordControl, "123")
 
-  //   const navbar = screen.getByTestId('app-navbar');
-  //   const welcomeUser = screen.getByTestId('welcome-user');
-  //   const logoutButton = screen.getByTestId('logout-button');
-  //   const shareMovieButton = screen.getByTestId('share-movie-button');
-  //   expect(navbar).toBeInTheDocument();
-  //   expect(welcomeUser).toBeInTheDocument();
-  //   expect(welcomeUser).toHaveTextContent(`Welcome ${authUser.email}`);
-  //   expect(logoutButton).toBeInTheDocument();
-  //   expect(shareMovieButton).toBeInTheDocument();
-  // });
+    // show error when fields are invalid
+    const emailError = screen.queryByTestId('error_email');
+    const passwordError = screen.queryByTestId('error_password');
+    expect(emailError).toBeInTheDocument();
+    expect(passwordError).toBeInTheDocument();
 
-  // it('should not show any error message when the login-form is loaded at the first time', () => {
-  //   render(
-  //     <AppProvider>
-  //       <AppNavbar />
-  //     </AppProvider>
-  //   );
+    // cannot call login when fields are invalid
+    await user.click(submitButton);
+    expect(mockLogin).toBeCalledTimes(0);
+  });
 
+  it('should call login function when the login form fields are valid', async () => {
+    const mockLogin = jest.fn();
+    const user = userEvent.setup();
 
+    mockUseApp.mockImplementation(() => ({
+      ...defaultUseAppReturnedValues,
+      login: mockLogin
+    }));
 
-  //   const passwordErrorMessage = screen.queryByTestId('password-error');
-  //   const usernameOrEmailErrorMessage = screen.queryByTestId(
-  //     'username-or-password-error'
-  //   );
-  //   expect(usernameOrEmailErrorMessage).toBeNull();
-  //   expect(passwordErrorMessage).toBeNull();
-  // });
+    render(
+      <AppNavbar />
+    );
 
-  // it('should show errors message when all the fields are not entered', async () => {
-  //   render(<Login />);
-  //   const buttonElement = screen.getByTestId('submit-btn');
-  //   await act(() => userEvent.click(buttonElement));
-  //   const usernameOrEmailErrorMessage = screen.queryByTestId(
-  //     'username-or-password-error'
-  //   );
-  //   const passwordErrorMessage = screen.getByTestId('password-error');
-  //   expect(usernameOrEmailErrorMessage).toBeInTheDocument();
-  //   expect(passwordErrorMessage).toBeInTheDocument();
-  // });
+    const emailControl = screen.getByTestId('control_email');
+    const passwordControl = screen.getByTestId('control_password');
+    // const loginRegisterForm = screen.getByTestId('login-register-form');
+    const submitButton = screen.getByTestId('submit-button');
+
+    // set valid value for both email and password
+    await user.type(emailControl, authUser.email)
+    await user.type(passwordControl, "123456")
+
+    // dont show error when fields are valid
+    const emailError = screen.queryByTestId('error_email');
+    const passwordError = screen.queryByTestId('error_password');
+    expect(emailError).not.toBeInTheDocument();
+    expect(passwordError).not.toBeInTheDocument();
+
+    // can call login when fields are invalid
+    await user.click(submitButton);
+    expect(mockLogin).toBeCalledTimes(1);
+
+    expect(mockLogin).toHaveBeenCalledWith({
+      email: authUser.email,
+      password: "123456"
+    });
+  });
+
+  it('should render navbar correctly when user loged in', async () => {
+    const logoutFn = jest.fn();
+
+    mockUseApp.mockImplementation(() => ({
+      ...defaultUseAppReturnedValues,
+      isAuth: true,
+      user: authUser,
+      loading: false,
+      logout: logoutFn,
+    }))
+    render(
+      <AppNavbar />
+    );
+    const navbar = screen.getByTestId('app-navbar');
+    const welcomeUser = screen.getByTestId('welcome-user');
+    const logoutButton = screen.getByTestId('logout-button');
+    const shareMovieButton = screen.getByTestId('share-movie-button');
+    expect(navbar).toBeInTheDocument();
+    expect(welcomeUser).toBeInTheDocument();
+    expect(welcomeUser).toHaveTextContent(`Welcome ${authUser.email}`);
+    expect(logoutButton).toBeInTheDocument();
+    expect(shareMovieButton).toBeInTheDocument();
+
+    fireEvent.click(logoutButton);
+    expect(logoutFn).toHaveBeenCalledTimes(1);
+  });
 });

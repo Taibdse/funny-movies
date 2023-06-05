@@ -1,6 +1,6 @@
 # Introduction
 
-This prject is called **Funnny movie** to offer users a place to share the interesting movies just by sending the youtube video link to users access the application. the main features are the guest users can view the list of shared movies, the auth users can share the video by saving the youtube video link, other auth users can see the real-time notificaions when someone just posted the video.
+This project is called **Funnny movie** to offer users a place to share the interesting movies just by sending the youtube video link to users access the application. the main features are the guest users can view the list of shared movies, the auth users can share the video by saving the youtube video link, other auth users can see the real-time notificaions when someone just posted the video.
 
 https://funny-movies-1agb3fay9-buiductai232.vercel.app/
 
@@ -123,6 +123,8 @@ We can see the list of shared movies here: https://funny-movies-c5qb.onrender.co
 
 ![render.com deployment](https://res.cloudinary.com/ductai/image/upload/v1685767064/test/render-be-funny-movie-deploy-2_rtf2qc.png "This is a sample image.")
 
+**Deploy Database**
+Using AWS RDS to create and manage Postgres data
 
 # Usage
 At the very fitst time access the application domain, we can see the list of shared movies. We can create a new account by input email and password in the navbar. After that we click on the **Share a movie** button to navigate to the page where we can input the video link to share. After sharing, the other loged-in users can see the notification with our name and video's title that we just shared
